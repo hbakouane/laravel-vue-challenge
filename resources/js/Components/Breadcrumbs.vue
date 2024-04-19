@@ -1,4 +1,6 @@
 <script setup>
+import { Link } from "@inertiajs/vue3";
+
 defineProps({
     items: Object
 })
@@ -8,11 +10,11 @@ defineProps({
     <div>
         <ul>
             <li v-for="(item, index) in items" :key="index" class="inline-block mr-2">
-                <a
+                <Link
                     v-text="item.title"
                     :href="item.href"
                     :class="{ 'text-white': (index + 1) !== items.length, 'text-gray-500': (index + 1) === items.length }"
-                ></a>
+                ></Link>
                 <span class="pl-3 text-white" v-if="(index + 1) !== items.length">></span>
             </li>
         </ul>

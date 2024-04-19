@@ -1,7 +1,8 @@
 <script setup>
 import Pagination from '@/Components/Pagination.vue'
-import {computed, ref} from "vue";
+import {ref, watch} from "vue";
 import { Link } from "@inertiajs/vue3";
+import { router } from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumbs from "@/Components/Breadcrumbs.vue";
 
@@ -9,25 +10,25 @@ const props = defineProps({
     tickets: Array,
 })
 
-const currentPage = ref(1);
-const perPage = ref(10);
+let currentPage = ref(props.tickets.current_page);
+const perPage = ref(15);
 
-const paginatedTickets = computed(() => {
-    let start = (currentPage.value - 1) * perPage.value;
-    let end = start + perPage.value;
-    return props.tickets.slice(start, end);
-})
+const tickets = props.tickets
 
 const breadcrumbs = [
     {
         title: 'Dashboard',
-        href: '/Dashboard'
+        href: route('dashboard')
     },
     {
         title: 'Tickets',
-        href: '/tickets'
+        href: route('tickets.index')
     }
 ]
+
+watch(currentPage, value => {
+    router.get('/tickets', { page: value })
+})
 </script>
 
 <template>
@@ -72,7 +73,7 @@ const breadcrumbs = [
                     </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-700">
-                    <tr v-for="ticket in paginatedTickets" :key="ticket.id">
+                    <tr v-for="ticket in tickets.data" :key="ticket.id">
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">{{ ticket.id }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">{{ ticket.created_at }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-100">{{ ticket.title }}</td>
@@ -87,8 +88,9 @@ const breadcrumbs = [
                     </tr>
                     </tbody>
                 </table>
+
                 <Pagination
-                    :total-items="tickets.length"
+                    :total-items="tickets.total"
                     :current-page.sync="currentPage"
                     :per-page="perPage"
                     @update:currentPage="currentPage = $event"

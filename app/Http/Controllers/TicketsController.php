@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\TicketPriority;
 use App\Enums\TicketStatus;
 use App\Http\Requests\Tickets\CreateTicketRequest;
+use App\Models\Core;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 
@@ -17,7 +18,8 @@ class TicketsController extends Controller
     {
         $tickets = Ticket::with('user')
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(Core::ITEMS_PER_PAGE);
+
         return inertia('Tickets/Index', [
             'tickets' => $tickets,
         ]);

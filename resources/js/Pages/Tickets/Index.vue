@@ -3,6 +3,7 @@ import Pagination from '@/Components/Pagination.vue'
 import {computed, ref} from "vue";
 import { Link } from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import Breadcrumbs from "@/Components/Breadcrumbs.vue";
 
 const props = defineProps({
     tickets: Array,
@@ -16,13 +17,27 @@ const paginatedTickets = computed(() => {
     let end = start + perPage.value;
     return props.tickets.slice(start, end);
 })
+
+const breadcrumbs = [
+    {
+        title: 'Dashboard',
+        href: '/Dashboard'
+    },
+    {
+        title: 'Tickets',
+        href: '/tickets'
+    }
+]
 </script>
 
 <template>
     <AuthenticatedLayout>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center py-6">
-                <h1 class="text-2xl font-semibold text-gray-100">Tickets</h1>
+                <div>
+                    <h1 class="text-2xl font-semibold text-gray-100">Tickets</h1>
+                    <Breadcrumbs :items="breadcrumbs" />
+                </div>
                 <a href="/tickets/create"
                    class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                     Create Ticket

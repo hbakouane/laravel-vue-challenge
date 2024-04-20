@@ -10,7 +10,7 @@ const priorities = {
 
 const statuses = {
     open: 'Open',
-    inProgress: 'In Progress',
+    in_progress: 'In Progress',
     closed: 'Closed',
 };
 

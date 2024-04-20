@@ -5,6 +5,7 @@ import { Link } from "@inertiajs/vue3";
 import { router } from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Breadcrumbs from "@/Components/Breadcrumbs.vue";
+import DateHelper from '@/Utils/Helpers/DateHelper.js'
 
 const props = defineProps({
     tickets: Object,
@@ -26,11 +27,23 @@ const breadcrumbs = [
     }
 ]
 
-const users = reactive(props.tickets.data.map(ticket => ticket['user']))
+let usersList = props.tickets.data.map(ticket => ticket['user'])
+
+const users = reactive([])
+
+usersList.forEach(user => {
+    let userDoesNotExist = user => {
+        return users.filter(existingUser => existingUser.id === user.id).length === 0
+    }
+
+    if (userDoesNotExist(user)) users.push(user)
+})
 
 let search = reactive({
     title: null,
+    description: null,
     user_id: null,
+    'user.email': null,
     priority: null,
     status: null,
     submitted_from: null,
@@ -44,6 +57,10 @@ watch(search, newSearchValue => {
     Object.keys(newSearchValue).forEach(key => {
         if (newSearchValue[key]) params[`filter[${key}]`] = newSearchValue[key]
     })
+
+    if (Object.keys(newSearchValue).includes('user.email')) params.includes = 'user'
+
+    console.log(params)
 
     return router.get(route('tickets.index'), params, {
         preserveState: true,
@@ -73,6 +90,25 @@ watch(currentPage, value => {
                 </a>
             </div>
             <div class="overflow-x-auto shadow  sm:rounded-lg">
+                <div class="p-3 border rounded w-fit mb-7">
+                    <div class="inline-block">
+                        <label for="description" class="text-white">Description</label> <br />
+                        <input v-model="search.description" type="text" id="description" placeholder="Description" class="input text-white">
+                    </div>
+
+                    <div class="inline-block ml-4">
+                        <label for="email" class="text-white">Email</label> <br />
+                        <select v-model="search['user.email']" class="w-full input text-white">
+                            <option selected disabled>Select User Email</option>
+                            <option
+                                v-for="(user, index) in users"
+                                :key="index"
+                                :value="user.id"
+                            >{{ user.email }}</option>
+                        </select>
+                    </div>
+                </div>
+
                 <table class="min-w-full divide-y divide-gray-700">
                     <thead class="">
                         <tr>
@@ -119,6 +155,7 @@ watch(currentPage, value => {
                             </th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                                 <select v-model="search.user_id" class="w-full input">
+                                    <option selected disabled>Select User</option>
                                     <option
                                         v-for="(user, index) in users"
                                         :key="index"
@@ -128,6 +165,7 @@ watch(currentPage, value => {
                             </th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                                 <select v-model="search.priority" class="w-full input">
+                                    <option selected disabled>Select Priority</option>
                                     <option value="low">Low</option>
                                     <option value="medium">Medium</option>
                                     <option value="high">High</option>
@@ -135,6 +173,7 @@ watch(currentPage, value => {
                             </th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                                 <select v-model="search.status" class="w-full input">
+                                    <option selected disabled>Select Status</option>
                                     <option value="open">Open</option>
                                     <option value="in_progress">In Progress</option>
                                     <option value="closed">Closed</option>
@@ -148,7 +187,7 @@ watch(currentPage, value => {
                     <tbody class="divide-y divide-gray-700">
                     <tr v-for="ticket in tickets.data" :key="ticket.id">
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">{{ ticket.id }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">{{ ticket.created_at }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">{{ DateHelper.formatDate(new Date(ticket.created_at)) }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-100">{{ ticket.title }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">{{ ticket.user.name }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">{{ ticket.priority }}</td>

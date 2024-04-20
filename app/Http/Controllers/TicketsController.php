@@ -21,11 +21,14 @@ class TicketsController extends Controller
         $tickets = QueryBuilder::for(Ticket::class)
             ->with('user')
             ->orderBy('created_at', 'DESC')
+            ->allowedIncludes('user')
             ->allowedFilters([
                 'user_id',
                 'title',
+                'description',
                 'priority',
                 'status',
+                'user.email',
                 AllowedFilter::scope('submitted_from'),
                 AllowedFilter::scope('submitted_to')
             ])->paginate(Core::ITEMS_PER_PAGE);

@@ -8,6 +8,8 @@ use App\Http\Requests\Tickets\CreateTicketRequest;
 use App\Models\Core;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class TicketsController extends Controller
 {
@@ -16,9 +18,17 @@ class TicketsController extends Controller
      */
     public function index()
     {
-        $tickets = Ticket::with('user')
-            ->orderBy('created_at', 'desc')
-            ->paginate(Core::ITEMS_PER_PAGE);
+        $tickets = QueryBuilder::for(Ticket::class)
+            ->with('user')
+            ->orderBy('created_at', 'DESC')
+            ->allowedFilters([
+                'user_id',
+                'title',
+                'priority',
+                'status',
+                AllowedFilter::scope('submitted_from'),
+                AllowedFilter::scope('submitted_to')
+            ])->paginate(Core::ITEMS_PER_PAGE);
 
         return inertia('Tickets/Index', [
             'tickets' => $tickets,

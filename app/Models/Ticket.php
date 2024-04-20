@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\TicketPriority;
 use App\Enums\TicketStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -25,6 +26,30 @@ class Ticket extends Model
         'status' => TicketStatus::class,
         'priority' => TicketPriority::class,
     ];
+
+    /**
+     * Scope to get the tickets that were created after a date
+     *
+     * @param Builder $query
+     * @param string $date
+     * @return Builder
+     */
+    public function scopeSubmittedFrom(Builder $query, string $date)
+    {
+        return $query->whereDate('created_at', '>=', $date);
+    }
+
+    /**
+     * Scope to get the tickets that were created before a date
+     *
+     * @param Builder $query
+     * @param string $date
+     * @return Builder
+     */
+    public function scopeSubmittedTo(Builder $query, string $date)
+    {
+        return $query->whereDate('created_at', '<=', $date);
+    }
 
     public function user(): BelongsTo
     {

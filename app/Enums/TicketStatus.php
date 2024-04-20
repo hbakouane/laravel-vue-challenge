@@ -16,4 +16,18 @@ enum TicketStatus: string
             self::Closed->value => self::Closed->name,
         ];
     }
+
+    /**
+     * Get a list of all the values
+     *
+     * @return array
+     */
+    public static function values()
+    {
+        return [
+            self::Open->value,
+            self::InProgress->value,
+            self::Closed->value
+        ];
+    }
 }
